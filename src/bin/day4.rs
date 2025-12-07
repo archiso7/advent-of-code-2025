@@ -1,9 +1,13 @@
-fn problem_one(input: &str) -> i64 {
+fn problem_one(input: &str) -> (i64, String) {
     let mut total = 0;
     let lines: Vec<&str> = input.lines().collect();
     let num_rows = lines.len();
+    let mut output = String::new();
 
     for (l, line) in lines.iter().enumerate() {
+        if l > 0 {
+            output.push('\n');
+        }
         let num_cols = line.len();
         for (c, ch) in line.chars().enumerate() {
             if ch == '@' {
@@ -25,15 +29,28 @@ fn problem_one(input: &str) -> i64 {
                 }
                 if surrounding < 4 {
                     total += 1;
+                    output.push('.'); // replace removed @ with .
+                } else {
+                    output.push('@'); // keep @ with enough neighbors
                 }
+            } else {
+                output.push(ch);
             }
         }
     }
-    total
+    (total, output)
 }
 
-// fn problem_two(input: &str) -> i64 {
-// }
+fn problem_two(input: &str) -> i64 {
+    let mut total = 0;
+    let mut round_total = 1;
+    let mut round_input = input.to_string();
+    while round_total != 0 {
+        (round_total, round_input) = problem_one(&round_input);
+        total += round_total;
+    }
+    total
+}
 
 fn main() {
     let input = "...@@@.@@@@.@@.@@@@@@..@@@.@@@@@.@@@.@@@@@..@@@.@@@@@@...@@@.@.@@@@.@@.@.@.@@@@@@..@..@@.@@@@@@.@@@@.@.@..@@..@.@@@...@@@@..@..@.@.@@.@@@...
@@ -177,7 +194,7 @@ fn main() {
 @@@@@@@..@@@.@..@...@.@..@@@.@@@@....@@@..@@@@@..@.@@@.@@@.@@@.@..@@@.@.@@...@@...@@@.@.@@.@..@@@@@@@@@@@@.@@.@@.@...@@..@.@.@@@@@.@@.@@@@@@
 @.@@@@@.@.@..@@@....@@@@.@.@@@@@@@@@@@@.@@@@@@@..@.@.@@@@@@.@@..@@@..@@@@@.@@.@@..@@@.@..@@.@.@.@@@@..@...@@@@@@@@@..@@.@@.@.@@...@..@@@@@@.
 ";
-    let result = problem_one(input);
+    let result = problem_two(input);
     println!("{}", result);
 }
 
@@ -198,16 +215,16 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let result = problem_one(INPUT);
+        let (result, _) = problem_one(INPUT);
         let correct = 13;
         println!("Test result: {}", result);
         assert_eq!(result, correct);
     }
-    // #[test]
-    // fn test_part_two() {
-    //     let result = problem_two(INPUT);
-    //     let correct = ;
-    //     println!("Test result: {}", result);
-    //     assert_eq!(result, correct);
-    // }
+    #[test]
+    fn test_part_two() {
+        let result = problem_two(INPUT);
+        let correct = 43;
+        println!("Test result: {}", result);
+        assert_eq!(result, correct);
+    }
 }
